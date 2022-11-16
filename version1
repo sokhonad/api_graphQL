@@ -1,0 +1,55 @@
+{
+  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL3NwYWNlYXBpLmNvbS9ncmFwaHFsIjp7InJvbGVzIjpbImFzdHJvbmF1dCJdLCJwZXJtaXNzaW9ucyI6WyJyZWFkOm93bl91c2VyIl19LCJpYXQiOjE2Njg0MjA3NzUsImV4cCI6MTY2ODUwNzE3NSwic3ViIjoiNjc4OTAifQ.pA2CLaM5MJMwtRF7ID55K_J-ylmiR7QkImn-R1Bf4jg"
+}
+
+
+      const { urlencoded } = require("express");
+const e = require("express");
+const jwt =require("jsonwebtoken");
+
+// const { users } =require("../models/data");
+const modelUsers  =require("../models/user");
+
+
+module.exports= {
+  Query: {
+    user(parent, { id }) {
+      return modelUsers.find(user => user.id === id);
+    },
+    viewer: async (_, args, { user }) =>{
+      return  await modelUsers.findOne({ id: user.sub }).exec();
+    }
+  },
+  Mutation: {
+    createUser: async (_, 
+      { 
+        name ,
+        email,
+        password
+      }
+) => {
+      const user = new modelUsers({
+        name ,
+        email,
+        password,
+        roles:[],
+        permissions:[]
+        });
+      await user.save();
+      return user;
+    },
+
+    login: async  (_, { email, password })=>{
+     const user= await modelUsers.find({ email: email }).exec();
+     const { id,name, permissions, roles } = user.find(
+      user => user.email === email && user.password === password
+    );
+    return jwt.sign(
+      { "https://spaceapi.com/graphql": { name,roles, permissions } },
+      "SUPER_SECRET",
+      { algorithm: "HS256", subject: id, expiresIn: "1d" }
+    );
+    }
+  }
+};
+
