@@ -1,4 +1,4 @@
-const { and, or, rule, shield } = require("graphql-shield");
+const { and, rule, shield } = require("graphql-shield");
 
 function checkPermission(user, permission) {
   if (user && user["https://spaceapi.com/graphql"]) {
@@ -21,16 +21,13 @@ const ruleUser = rule()((parent, args, { user }) => {
   return checkPermission(user, "read:user");
 });
 
-const isReadingOwnUser = rule()((parent, { id }, { user }) => {
-  return user && user.sub === id;
-});
-
 module.exports=shield({
   Query:{
     viewer: isAuthenticated
   },
   Mutation: {
-    // createAnnonce: or(and(isAuthenticated, ruleRoot), ruleUser),
-    createAnnonce: {isAuthenticated, ruleRoot}
+    createAnnonce: and(isAuthenticated, ruleRoot),
+    deleteAnnonce: and(isAuthenticated, ruleRoot),
+    updateAnnonce: and(isAuthenticated, ruleRoot)
   }
 });

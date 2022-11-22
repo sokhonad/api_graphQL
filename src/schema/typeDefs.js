@@ -16,10 +16,10 @@ module.exports= gql`
     dateDisponibilite: String!
     description: String!
     photos: String!
-    comment :[comment]
+    comments :[comments]
   }
 
-  type comment {
+  type comments {
     commenterId:String!
     commenterPseudo: String!
     text: String!
@@ -41,7 +41,7 @@ module.exports= gql`
       password: String!
       roles: [String]
       permissions: [String]
-      ): User!
+      ): User
 
       createAnnonce(
         titre: String!
@@ -67,5 +67,7 @@ module.exports= gql`
         description: String
         photos: String
         ): annonce!
+
+      commentAnnonce(id: String!,text: String!): annonce!
   }
 `;
