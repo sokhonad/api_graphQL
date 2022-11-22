@@ -1,1 +1,7 @@
+# editor
+
+.vscode
+
+# packages
+
 node_modules
